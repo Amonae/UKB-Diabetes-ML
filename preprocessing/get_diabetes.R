@@ -34,9 +34,10 @@ head(colIDs)
 colFields = meta$Field[match(colIDs, meta$FieldID)]
 
 # Dataframe with only diabetes data
-doctor = bd %>% drop_na(Diabetes2) # Non imaging. Only want to include patients that have had a repeat visit
+doctor = bd %>% drop_na(Diabetes2) # Non imaging diagnosis. Only want to include patients that have had a repeat visit
 dim(doctor) #  20334 15935
+doctor = rbind(colIDs, colFields, doctor)
 
-imaging = bd %>% drop_na(Diabetes_imaging2) # Only want to include patients that have had a repeat visit
+imaging = bd %>% drop_na(Diabetes_imaging2) # Imaging diagnosis. Only want to include patients that have had a repeat visit
 dim(imaging) # 5274 15935
 
