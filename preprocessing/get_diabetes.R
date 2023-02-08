@@ -48,14 +48,22 @@ colIDs = gsub("\\..*","",colIDs)
 head(colIDs)
 colFields = meta$Field[match(colIDs, meta$FieldID)]
 
-# Dataframe with only diabetes data
+# Dataframes with only diabetes data
 doctor = bd %>% drop_na(Diabetes2) # Non imaging diagnosis. Only want to include patients that have had a repeat visit
 dim(doctor) #  20334 15935
-
 
 imaging = bd %>% drop_na(Diabetes_imaging2) # Imaging diagnosis. Only want to include patients that have had a repeat visit
 dim(imaging) # 5274 15935
 
 # Adding metadata to rows in doctor and imaging dfs
-doctor[,Date_cols] = lapply(doctor[,Date_cols], as.character)
 doctor = rbind(colIDs, colFields, doctor)
+imaging = rbind(colIDs, colFields, imaging)
+
+# Removing columns with >40% missingness
+doctor = doctor[,!sapply(doctor, function(x) mean(is.na(x)))>0.4] # new dim 20336 1941
+imaging = imaging[,!sapply(imaging, function(x) mean(is.na(x)))>0.4] # new dim 5276 3825
+
+# Saving files
+write.table(doctor, file = "doctor_DM.txt", row.names = F, quote = F)
+write.table(imaging, file = "imaging_DM.txt", row.names = F, quote = F)
+
