@@ -18,16 +18,22 @@ suppressPackageStartupMessages(library(dplyr,lib.loc=lib_loc))
 suppressPackageStartupMessages(library(cli,lib.loc=lib_loc))
 suppressPackageStartupMessages(library(tidyr,lib.loc=lib_loc))
 
+
 # Loading UKB data. This is a giant file
 load(ukb_loc) # this file will be named 'bd'
 dim(bd) # 502402  15935
-bd_classes = sapply(bd, class) # viewing class types of columns
-table(unlist(bd_classes)) 
+bd_classes = unlist(sapply(bd, class)) # viewing class types of columns
+table(bd_classes) 
 # character      Date   integer integer64   logical   numeric   POSIXct    POSIXt
 #     1440        52      9804        45      1000      3445       149       149
 
-Ambig_cols = names(bd_classes[bd_classes %in% c("Date", "POSIXct", "POSIXt")]) # Going to rbind later, and need to fix these column formats
-doctor[,Ambig_cols] = lapply(doctor[,Ambig_cols], as.character)
+
+## Going to rbind later, and need to fix these column formats. 
+# All columns of class POSIXct are also class POSIXt. sapply added either a 1 or 2 after the column name and created 2 entries
+Date_cols = names(bd_classes[bd_classes == "Date"])
+POS_cols = names(bd_classes[bd_classes %in% c( "POSIXt")])
+POS_cols = gsub('.{1}$', '', POS_cols) # removing last digit from colnames so they match bd colnames
+bd[,c(Date_cols,POS_cols)] = lapply(bd[,c(Date_cols,POS_cols)], as.character) # converting dates to character
 
 # Renaming a few columns
 names(bd)[grepl("eid", names(bd))] = "IID"   # renaming individual ID column
