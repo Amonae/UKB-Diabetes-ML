@@ -59,9 +59,9 @@ dim(imaging) # 5274 15935
 doctor = rbind(colIDs, colFields, doctor)
 imaging = rbind(colIDs, colFields, imaging)
 
-# Removing columns with >40% missingness
-doctor = doctor[,!sapply(doctor, function(x) mean(is.na(x)))>0.4] # new dim 20336 1941
-imaging = imaging[,!sapply(imaging, function(x) mean(is.na(x)))>0.4] # new dim 5276 3825
+# Removing columns with >80% missingness
+doctor = doctor[,!sapply(doctor, function(x) mean(is.na(x)))>0.8] # 
+imaging = imaging[,!sapply(imaging, function(x) mean(is.na(x)))>0.8] # 
 
 # Saving files
 write.table(doctor, file = "doctor_DM.txt", row.names = F, quote = F)
