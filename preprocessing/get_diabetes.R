@@ -21,6 +21,15 @@ suppressPackageStartupMessages(library(tidyr,lib.loc=lib_loc))
 # Loading UKB data. This is a giant file
 load(ukb_loc) # this file will be named 'bd'
 dim(bd) # 502402  15935
+bd_classes = sapply(bd, class) # viewing class types of columns
+table(unlist(bd_classes)) 
+# character      Date   integer integer64   logical   numeric   POSIXct    POSIXt
+#     1440        52      9804        45      1000      3445       149       149
+
+Ambig_cols = names(bd_classes[bd_classes %in% c("Date", "POSIXct", "POSIXt")]) # Going to rbind later, and need to fix these column formats
+doctor[,Ambig_cols] = lapply(doctor[,Ambig_cols], as.character)
+
+# Renaming a few columns
 names(bd)[grepl("eid", names(bd))] = "IID"   # renaming individual ID column
 setnames(bd, old = FieldID, new = Field)  # renaming Field columns 
 
@@ -36,8 +45,11 @@ colFields = meta$Field[match(colIDs, meta$FieldID)]
 # Dataframe with only diabetes data
 doctor = bd %>% drop_na(Diabetes2) # Non imaging diagnosis. Only want to include patients that have had a repeat visit
 dim(doctor) #  20334 15935
-doctor = rbind(colIDs, colFields, doctor)
+
 
 imaging = bd %>% drop_na(Diabetes_imaging2) # Imaging diagnosis. Only want to include patients that have had a repeat visit
 dim(imaging) # 5274 15935
 
+# Adding metadata to rows in doctor and imaging dfs
+doctor[,Date_cols] = lapply(doctor[,Date_cols], as.character)
+doctor = rbind(colIDs, colFields, doctor)
